@@ -718,18 +718,20 @@ header.top {
   }
 
   .header-title-block h1 {
-    font-size: 14.5px;
+    font-size: 12px;
     font-weight: 700;
     text-align: right;
     color: #ffffff;
     line-height: 1.2;
+    white-space: nowrap;
   }
 
   .header-title-block p {
-    font-size: 10px;
+    font-size: 9.5px;
     text-align: right;
     color: var(--text-muted);
-    margin-top: 3px;
+    margin-top: 2px;
+    white-space: nowrap;
   }
 
   /* Controls stay natural and count tag is LEFT-aligned */
