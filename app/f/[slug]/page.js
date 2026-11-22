@@ -9,7 +9,7 @@ export default async function FolderPage({ params }) {
   if (!config()) {
     return (
       <main className="wrap">
-        <div className="warn-card">Cloudflare D1 environment variables are missing on Vercel.</div>
+        <div className="warn-card">[ERR_CONFIG] Cloudflare D1 environment variables missing on Vercel.</div>
       </main>
     );
   }
@@ -21,30 +21,34 @@ export default async function FolderPage({ params }) {
     <main className="wrap">
       <div className="top-nav">
         <Link href="/" className="back-btn">
-          &larr; Back to All Folders
+          &lt;-- RETURN_TO_ROOT // ALL_FOLDERS
         </Link>
       </div>
 
       <section className="folder-detail-container">
-        {/* Folder Header */}
+        {/* Terminal Folder Header */}
         <div className="folder-header-card">
           <div className="header-meta">
-            <span className="badge-pill">Archived Folder</span>
+            <div className="terminal-brand">
+              <span>[DIR_INSPECT]</span>
+              <span className="morse-code">.. -. ... .--. . -.-. -</span>
+            </div>
             <h1 className="header-title">{folder.folder_label}</h1>
             
             <div className="email-box">
+              <span>TARGET_MAIL: </span>
               <span className="email-display">{folder.email}</span>
             </div>
 
             <div className="time-stamp-box">
-              <span>🕒 Created: {folder.date_ist} at {folder.time_ist} IST</span>
+              <span>TIMESTAMP: {folder.date_ist} // {folder.time_ist} IST</span>
               <span className="sep">&bull;</span>
-              <span>Cloudflare D1 Storage</span>
+              <span>STORAGE: CLOUDFLARE_D1 [doc-dustbin]</span>
             </div>
           </div>
         </div>
 
-        {/* 2 High-Res Photos Display */}
+        {/* 2 Stored High-Res Photographs */}
         <PhotoGallery photos={folder.photos} email={folder.email} />
       </section>
     </main>

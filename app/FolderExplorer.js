@@ -17,53 +17,47 @@ export default function FolderExplorer({ initialFolders = [] }) {
 
   return (
     <div className="explorer">
-      {/* Search & Filter Bar */}
+      {/* Search & Prompt Filter */}
       <div className="controls">
         <div className="search-wrap">
-          <svg className="search-icon" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <span className="prompt-prefix">&gt;</span>
           <input
             type="text"
             className="search-input"
-            placeholder="Search folders by email, name or date..."
+            placeholder="filter --email / --domain / --date..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           {search ? (
             <button className="clear-btn" onClick={() => setSearch("")}>
-              ✕
+              [x]
             </button>
           ) : null}
         </div>
         <div className="count-tag">
-          {filtered.length} of {initialFolders.length} Folders
+          [MATCH: {filtered.length}/{initialFolders.length}]
         </div>
       </div>
 
       {filtered.length === 0 ? (
         <div className="empty-box">
-          <div className="empty-icon">📁</div>
-          <h3>{search ? "No matching folders found" : "No folders created yet"}</h3>
+          <div className="empty-icon">[NO_DATA]</div>
+          <h3>{search ? "QUERY RETURNED 0 MATCHES" : "NO ARCHIVES DETECTED"}</h3>
           <p>
             {search
-              ? "Try searching for a different email address or domain."
-              : "Send 2 photos and an email to your Telegram Bot. They will automatically organize into folders here!"}
+              ? "No directory matches search criteria. Clear filter to see all records."
+              : "Awaiting Telegram bot intake. Forward 2 photos and an email to generate a folder."}
           </p>
         </div>
       ) : null}
 
       {/* Grid of Folders */}
       <section className="grid">
-        {filtered.map((folder) => {
-          // Smart formatting: handle mailbox and domain separation
+        {filtered.map((folder, index) => {
           const emailParts = folder.email.split("@");
           const username = emailParts[0];
           const domain = emailParts[1] ? `@${emailParts[1]}` : "";
+          const hexId = (index + 1).toString(16).padStart(2, "0").toUpperCase();
 
           return (
             <Link
@@ -71,14 +65,14 @@ export default function FolderExplorer({ initialFolders = [] }) {
               className="folder-card"
               key={folder.id}
             >
-              {/* Folder Physical Tab */}
+              {/* Folder Terminal Tab */}
               <div className="folder-tab">
                 <span className="domain-pill" title={folder.email}>
-                  {domain || "folder"}
+                  #{hexId} {domain || "DIR"}
                 </span>
               </div>
 
-              {/* Photos Peeking Preview */}
+              {/* Photos Peeking / Radar Display */}
               <div className="folder-pocket">
                 <div className="preview-polaroids">
                   {folder.photoIds && folder.photoIds.length > 0 ? (
@@ -86,7 +80,7 @@ export default function FolderExplorer({ initialFolders = [] }) {
                       <div className="polaroid pic-left">
                         <img
                           src={`/api/photo/${folder.photoIds[0]}`}
-                          alt="Photo 1"
+                          alt="Feed 1"
                           loading="lazy"
                         />
                       </div>
@@ -94,25 +88,25 @@ export default function FolderExplorer({ initialFolders = [] }) {
                         <div className="polaroid pic-right">
                           <img
                             src={`/api/photo/${folder.photoIds[1]}`}
-                            alt="Photo 2"
+                            alt="Feed 2"
                             loading="lazy"
                           />
                         </div>
                       ) : null}
                     </>
                   ) : (
-                    <div className="empty-pocket">2 Photos</div>
+                    <div className="empty-pocket">[FEED_OFFLINE]</div>
                   )}
                 </div>
               </div>
 
-              {/* Folder Content / Metadata */}
+              {/* Folder Metadata Body */}
               <div className="folder-body">
                 <div className="folder-title" title={folder.email}>
                   {folder.folder_label || username}
                 </div>
 
-                {/* Smart full email display */}
+                {/* Monospace Email Tag */}
                 <div className="email-chip" title={folder.email}>
                   <span className="at-icon">@</span>
                   <span className="email-text">{folder.email}</span>
@@ -120,9 +114,9 @@ export default function FolderExplorer({ initialFolders = [] }) {
 
                 <div className="folder-meta">
                   <span className="time-badge">
-                    🕒 {folder.date_ist} &bull; {folder.time_ist} IST
+                    {folder.date_ist} &bull; {folder.time_ist} IST
                   </span>
-                  <span className="photo-count-pill">2 Pics</span>
+                  <span className="photo-count-pill">2_PICS</span>
                 </div>
               </div>
             </Link>
