@@ -17,6 +17,18 @@ async function computeHash(passcode) {
     .join("");
 }
 
+function applySecurityHeaders(response) {
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  response.headers.set(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; frame-ancestors 'none';"
+  );
+  return response;
+}
+
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
@@ -27,14 +39,16 @@ export async function middleware(request) {
     pathname.startsWith("/api/auth/verify") ||
     pathname === "/login"
   ) {
-    return NextResponse.next();
+    const res = NextResponse.next();
+    return applySecurityHeaders(res);
   }
 
   const expectedPasscode = process.env.APP_PASSCODE || process.env.PASSCODE;
 
   // If no passcode is configured in env, allow access
   if (!expectedPasscode) {
-    return NextResponse.next();
+    const res = NextResponse.next();
+    return applySecurityHeaders(res);
   }
 
   const tokenCookie = request.cookies.get("vault_session");
@@ -43,20 +57,23 @@ export async function middleware(request) {
   const isAuthenticated = tokenCookie && tokenCookie.value === expectedHash;
 
   if (!isAuthenticated) {
-    // If requesting photo API without auth, reject directly
+    // If requesting photo/folder API without auth, reject directly
     if (pathname.startsWith("/api/")) {
-      return new NextResponse(
+      const res = new NextResponse(
         JSON.stringify({ error: "Unauthorized access: Passcode required" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
+      return applySecurityHeaders(res);
     }
 
     // Redirect browser requests to /login
     const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
+    const res = NextResponse.redirect(loginUrl);
+    return applySecurityHeaders(res);
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+  return applySecurityHeaders(res);
 }
 
 export const config = {

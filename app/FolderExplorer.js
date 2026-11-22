@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function FolderExplorer({ initialFolders = [], error = "" }) {
   const [folders, setFolders] = useState(initialFolders);
   const [search, setSearch] = useState("");
-  const [deletingId, setDeletingId] = useState(null);
+  const [deletingSlug, setDeletingSlug] = useState(null);
 
   const filtered = folders.filter((f) => {
     const q = search.toLowerCase();
@@ -17,7 +17,7 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
     );
   });
 
-  const handleDelete = async (e, id, email) => {
+  const handleDelete = async (e, slug, email) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -25,18 +25,18 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
       return;
     }
 
-    setDeletingId(id);
+    setDeletingSlug(slug);
     try {
-      const res = await fetch(`/api/folder/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/folder/${encodeURIComponent(slug)}`, { method: "DELETE" });
       if (res.ok) {
-        setFolders((prev) => prev.filter((item) => item.id !== id));
+        setFolders((prev) => prev.filter((item) => item.folder_slug !== slug));
       } else {
         alert("Failed to delete folder. Check server credentials.");
       }
     } catch {
       alert("Network error while deleting folder.");
     } finally {
-      setDeletingId(null);
+      setDeletingSlug(null);
     }
   };
 
@@ -117,7 +117,7 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
             <Link
               href={`/f/${folder.folder_slug}`}
               className="folder-card"
-              key={folder.id}
+              key={folder.folder_slug}
             >
               {/* Folder Tab Header */}
               <div className="folder-tab">
@@ -126,7 +126,7 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
                 </span>
               </div>
 
-              {/* Photos Peeking / Preview */}
+              {/* Photos Peeking / Preview with Signed Tokens */}
               <div className="folder-pocket">
                 <div className="preview-polaroids">
                   {folder.photoIds && folder.photoIds.length > 0 ? (
@@ -176,11 +176,11 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
                     <span className="photo-count-pill">2 Pics</span>
                     <button
                       className="mini-del-btn"
-                      onClick={(e) => handleDelete(e, folder.id, folder.email)}
+                      onClick={(e) => handleDelete(e, folder.folder_slug, folder.email)}
                       title="Delete this folder"
-                      disabled={deletingId === folder.id}
+                      disabled={deletingSlug === folder.folder_slug}
                     >
-                      {deletingId === folder.id ? "..." : (
+                      {deletingSlug === folder.folder_slug ? "..." : (
                         <svg
                           width="11"
                           height="11"

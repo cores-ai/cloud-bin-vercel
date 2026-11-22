@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function PhotoGallery({ photos = [], email = "", folderId = null }) {
+export default function PhotoGallery({ photos = [], email = "", folderSlug = null }) {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [copied, setCopied] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -17,13 +17,13 @@ export default function PhotoGallery({ photos = [], email = "", folderId = null 
   };
 
   const handleDelete = async () => {
-    if (!folderId) return;
+    if (!folderSlug) return;
     if (!window.confirm("Permanently delete this folder and its photos from Cloudflare D1?")) {
       return;
     }
     setDeleting(true);
     try {
-      const res = await fetch(`/api/folder/${folderId}`, { method: "DELETE" });
+      const res = await fetch(`/api/folder/${encodeURIComponent(folderSlug)}`, { method: "DELETE" });
       if (res.ok) {
         router.push("/");
         router.refresh();
@@ -50,7 +50,7 @@ export default function PhotoGallery({ photos = [], email = "", folderId = null 
             {copied ? "✓ Copied" : "📋 Copy Email"}
           </button>
           
-          {folderId ? (
+          {folderSlug ? (
             <button
               className="delete-action-btn"
               onClick={handleDelete}
@@ -65,10 +65,10 @@ export default function PhotoGallery({ photos = [], email = "", folderId = null 
 
       <div className="photos-grid">
         {photos.map((photo, index) => {
-          const photoUrl = `/api/photo/${photo.id}`;
+          const photoUrl = `/api/photo/${photo.token || photo.id}`;
           const picNum = photo.position || index + 1;
           return (
-            <div className="photo-card" key={photo.id}>
+            <div className="photo-card" key={photo.id || index}>
               <div className="photo-card-top">
                 <span className="photo-index">Photo {picNum} of 2</span>
                 <a

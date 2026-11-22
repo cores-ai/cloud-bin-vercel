@@ -14,7 +14,13 @@ export default async function FolderPage({ params }) {
     );
   }
 
-  const folder = await folderBySlug(params.slug);
+  const slug = params?.slug;
+  // Security validation: ensure slug contains only safe characters
+  if (!slug || !/^[a-z0-9_-]+$/i.test(slug)) {
+    notFound();
+  }
+
+  const folder = await folderBySlug(slug);
   if (!folder) notFound();
 
   return (
@@ -33,7 +39,7 @@ export default async function FolderPage({ params }) {
               <span>[DIR_INSPECT]</span>
             </div>
             <h1 className="header-title">{folder.folder_label}</h1>
-            
+
             <div className="email-box">
               <span>Email: </span>
               <span className="email-display">{folder.email}</span>
@@ -48,7 +54,7 @@ export default async function FolderPage({ params }) {
         </div>
 
         {/* 2 Stored High-Res Photographs */}
-        <PhotoGallery photos={folder.photos} email={folder.email} folderId={folder.id} />
+        <PhotoGallery photos={folder.photos} email={folder.email} folderSlug={folder.folder_slug} />
       </section>
     </main>
   );
