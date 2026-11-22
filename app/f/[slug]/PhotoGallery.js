@@ -1,16 +1,40 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function PhotoGallery({ photos = [], email = "" }) {
+export default function PhotoGallery({ photos = [], email = "", folderId = null }) {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const router = useRouter();
 
   const copyEmail = () => {
     if (!email) return;
     navigator.clipboard.writeText(email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDelete = async () => {
+    if (!folderId) return;
+    if (!window.confirm("Permanently delete this folder and its photos from Cloudflare D1?")) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/folder/${folderId}`, { method: "DELETE" });
+      if (res.ok) {
+        router.push("/");
+        router.refresh();
+      } else {
+        alert("Failed to delete folder.");
+        setDeleting(false);
+      }
+    } catch {
+      alert("Network error.");
+      setDeleting(false);
+    }
   };
 
   return (
@@ -20,9 +44,23 @@ export default function PhotoGallery({ photos = [], email = "" }) {
           <h2>2 Stored Photos</h2>
           <p>Preserved in Cloudflare D1 storage</p>
         </div>
-        <button className="copy-action-btn" onClick={copyEmail}>
-          {copied ? "✓ Copied" : "📋 Copy Email"}
-        </button>
+        
+        <div className="toolbar-actions">
+          <button className="copy-action-btn" onClick={copyEmail}>
+            {copied ? "✓ Copied" : "📋 Copy Email"}
+          </button>
+          
+          {folderId ? (
+            <button
+              className="delete-action-btn"
+              onClick={handleDelete}
+              disabled={deleting}
+              title="Delete this folder"
+            >
+              {deleting ? "Deleting..." : "🗑 Delete Folder"}
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="photos-grid">

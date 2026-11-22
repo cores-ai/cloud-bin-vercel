@@ -48,7 +48,7 @@ export default async function FolderPage({ params }) {
         </div>
 
         {/* 2 Stored High-Res Photographs */}
-        <PhotoGallery photos={folder.photos} email={folder.email} />
+        <PhotoGallery photos={folder.photos} email={folder.email} folderId={folder.id} />
       </section>
     </main>
   );

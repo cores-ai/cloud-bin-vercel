@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function FolderExplorer({ initialFolders = [], error = "" }) {
+  const [folders, setFolders] = useState(initialFolders);
   const [search, setSearch] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
 
-  const filtered = initialFolders.filter((f) => {
+  const filtered = folders.filter((f) => {
     const q = search.toLowerCase();
     return (
       f.email.toLowerCase().includes(q) ||
@@ -15,11 +17,33 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
     );
   });
 
+  const handleDelete = async (e, id, email) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!window.confirm(`Delete folder for "${email}" and all its photos?`)) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/folder/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setFolders((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        alert("Failed to delete folder. Check server credentials.");
+      }
+    } catch {
+      alert("Network error while deleting folder.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="explorer">
       {/* Top Header */}
       <header className="top">
-        {/* Left side on mobile / top-left on desktop */}
         <div className="header-meta-side">
           <div className="terminal-brand">
             <span>Cloud Bin</span>
@@ -31,12 +55,11 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
           </div>
         </div>
 
-        {/* Right side on mobile: Title, Archived count, and Search Match count directly underneath */}
         <div className="header-title-block">
           <h1>Photo Vault Folders</h1>
-          <p>{initialFolders.length} archived folder{initialFolders.length === 1 ? "" : "s"}</p>
+          <p>{folders.length} archived folder{folders.length === 1 ? "" : "s"}</p>
           <div className="count-tag-mobile">
-            {filtered.length} of {initialFolders.length} folders
+            {filtered.length} of {folders.length} folders
           </div>
         </div>
       </header>
@@ -65,9 +88,8 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
             </button>
           ) : null}
         </div>
-        {/* Desktop count tag stays next to search bar on desktop only */}
         <div className="count-tag desktop-only">
-          {filtered.length} of {initialFolders.length} folders
+          {filtered.length} of {folders.length} folders
         </div>
       </div>
 
@@ -144,11 +166,40 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
                   <span className="email-text">{folder.email}</span>
                 </div>
 
+                {/* Folder Footer with Mini Delete Button */}
                 <div className="folder-meta">
                   <span className="time-badge">
                     {folder.date_ist} &bull; {folder.time_ist} IST
                   </span>
-                  <span className="photo-count-pill">2 Pics</span>
+                  
+                  <div className="meta-actions">
+                    <span className="photo-count-pill">2 Pics</span>
+                    <button
+                      className="mini-del-btn"
+                      onClick={(e) => handleDelete(e, folder.id, folder.email)}
+                      title="Delete this folder"
+                      disabled={deletingId === folder.id}
+                    >
+                      {deletingId === folder.id ? "..." : (
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M3 6h18" />
+                          <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" />
+                          <path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </Link>
