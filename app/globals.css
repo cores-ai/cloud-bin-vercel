@@ -44,19 +44,20 @@ a {
   padding: 24px 0 52px;
 }
 
-/* Header */
+/* ========================================================================== */
+/* Desktop Header Layout (Default)                                            */
+/* ========================================================================== */
 header.top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
+  align-items: flex-end;
+  gap: 16px;
   margin-bottom: 22px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 16px;
-  flex-wrap: wrap;
 }
 
-.header-left {
+.header-meta-side {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -78,15 +79,21 @@ header.top {
   letter-spacing: 0.15em;
 }
 
-header.top h1 {
-  margin: 2px 0 0;
-  font-size: 16px;
+.header-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header-title-block h1 {
+  margin: 0;
+  font-size: 16.5px;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.01em;
 }
 
-header.top p {
+.header-title-block p {
   margin: 0;
   color: var(--text-muted);
   font-size: 10.5px;
@@ -102,7 +109,6 @@ header.top p {
   padding: 5px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  align-self: flex-start;
 }
 
 .status-blink {
@@ -176,6 +182,7 @@ header.top p {
 .count-tag {
   color: var(--text-muted);
   font-size: 10px;
+  text-align: left;
 }
 
 /* Clean Empty State with Curved Corners */
@@ -669,39 +676,63 @@ header.top p {
     padding: 16px 0 40px;
   }
 
-  /* User requested: Top heading & info aligned to the RIGHT side on mobile */
+  /* Split header on mobile: Left side has Brand & Badge, Right side has ONLY the 2 items */
   header.top {
-    flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
-    gap: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
     margin-bottom: 16px;
     padding-bottom: 12px;
-  }
-
-  .header-left {
-    align-items: flex-end;
-    text-align: right;
     width: 100%;
   }
 
+  /* Left Side on Mobile */
+  .header-meta-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 6px;
+  }
+
   .terminal-brand {
-    justify-content: flex-end;
-  }
-
-  header.top h1 {
-    font-size: 15px;
-    text-align: right;
-  }
-
-  header.top p {
-    text-align: right;
+    justify-content: flex-start;
+    font-size: 9px;
   }
 
   .sys-status-badge {
-    align-self: flex-end;
+    align-self: flex-start;
+    padding: 4px 8px;
+    font-size: 9px;
   }
 
+  /* Right Side on Mobile: EXACTLY the 2 items from user's image */
+  .header-title-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .header-title-block h1 {
+    font-size: 14.5px;
+    font-weight: 700;
+    text-align: right;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+
+  .header-title-block p {
+    font-size: 10px;
+    text-align: right;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  /* Controls stay natural and count tag is LEFT-aligned */
   .controls {
     flex-direction: column;
     align-items: stretch;
@@ -716,7 +747,7 @@ header.top p {
 
   .count-tag {
     font-size: 9.5px;
-    text-align: right;
+    text-align: left; /* Kept on the left! */
   }
 
   .grid {
