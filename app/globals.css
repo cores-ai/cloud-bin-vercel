@@ -796,3 +796,137 @@ header.top {
     max-width: calc(100% - 80px);
   }
 }
+
+/* ========================================================================== */
+/* Security Passcode Gate Screen                                             */
+/* ========================================================================== */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--bg);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  transition: all 0.25s ease;
+}
+
+.login-card.unlocked {
+  border-color: var(--accent);
+  box-shadow: 0 0 25px var(--accent-soft);
+}
+
+.login-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9.5px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.brand-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent);
+}
+
+.login-title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.login-sub {
+  margin: 0 0 22px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.pin-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pin-box {
+  width: 48px;
+  height: 54px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  text-align: center;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.pin-box:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.pin-box.pin-filled {
+  border-color: var(--accent-border);
+}
+
+.pin-box.pin-err {
+  border-color: #f87171 !important;
+  color: #f87171 !important;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.login-status {
+  font-size: 10px;
+  min-height: 16px;
+}
+
+.status-idle {
+  color: var(--text-muted);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.status-loading {
+  color: var(--accent);
+}
+
+.status-granted {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.status-error {
+  color: #f87171;
+  font-weight: 600;
+}
+
+/* Shake Animation on Error */
+.shake {
+  animation: shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
