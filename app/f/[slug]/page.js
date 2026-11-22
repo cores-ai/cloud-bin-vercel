@@ -21,29 +21,28 @@ export default async function FolderPage({ params }) {
     <main className="wrap">
       <div className="top-nav">
         <Link href="/" className="back-btn">
-          &lt;-- RETURN_TO_ROOT // ALL_FOLDERS
+          &larr; Back to all folders
         </Link>
       </div>
 
       <section className="folder-detail-container">
-        {/* Terminal Folder Header */}
+        {/* Folder Header Card */}
         <div className="folder-header-card">
           <div className="header-meta">
             <div className="terminal-brand">
               <span>[DIR_INSPECT]</span>
-              <span className="morse-code">.. -. ... .--. . -.-. -</span>
             </div>
             <h1 className="header-title">{folder.folder_label}</h1>
             
             <div className="email-box">
-              <span>TARGET_MAIL: </span>
+              <span>Email: </span>
               <span className="email-display">{folder.email}</span>
             </div>
 
             <div className="time-stamp-box">
-              <span>TIMESTAMP: {folder.date_ist} // {folder.time_ist} IST</span>
+              <span>🕒 Created: {folder.date_ist} at {folder.time_ist} IST</span>
               <span className="sep">&bull;</span>
-              <span>STORAGE: CLOUDFLARE_D1 [doc-dustbin]</span>
+              <span>D1 doc-dustbin</span>
             </div>
           </div>
         </div>

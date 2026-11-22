@@ -24,30 +24,30 @@ export default function FolderExplorer({ initialFolders = [] }) {
           <input
             type="text"
             className="search-input"
-            placeholder="filter --email / --domain / --date..."
+            placeholder="filter folders by email / date..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           {search ? (
-            <button className="clear-btn" onClick={() => setSearch("")}>
-              [x]
+            <button className="clear-btn" onClick={() => setSearch("")} title="Clear search">
+              ✕
             </button>
           ) : null}
         </div>
         <div className="count-tag">
-          [MATCH: {filtered.length}/{initialFolders.length}]
+          {filtered.length} of {initialFolders.length} folders
         </div>
       </div>
 
+      {/* Clean, Subtle Empty Indicator (No bulky/weird box) */}
       {filtered.length === 0 ? (
-        <div className="empty-box">
-          <div className="empty-icon">[NO_DATA]</div>
-          <h3>{search ? "QUERY RETURNED 0 MATCHES" : "NO ARCHIVES DETECTED"}</h3>
-          <p>
+        <div className="empty-state">
+          <span className="empty-dot" />
+          <span className="empty-text">
             {search
-              ? "No directory matches search criteria. Clear filter to see all records."
-              : "Awaiting Telegram bot intake. Forward 2 photos and an email to generate a folder."}
-          </p>
+              ? "No folders matching search filter."
+              : "No folders recorded yet. Send 2 photos and an email to your Telegram bot."}
+          </span>
         </div>
       ) : null}
 
@@ -57,7 +57,7 @@ export default function FolderExplorer({ initialFolders = [] }) {
           const emailParts = folder.email.split("@");
           const username = emailParts[0];
           const domain = emailParts[1] ? `@${emailParts[1]}` : "";
-          const hexId = (index + 1).toString(16).padStart(2, "0").toUpperCase();
+          const numId = (index + 1).toString().padStart(2, "0");
 
           return (
             <Link
@@ -65,14 +65,14 @@ export default function FolderExplorer({ initialFolders = [] }) {
               className="folder-card"
               key={folder.id}
             >
-              {/* Folder Terminal Tab */}
+              {/* Folder Tab Header */}
               <div className="folder-tab">
                 <span className="domain-pill" title={folder.email}>
-                  #{hexId} {domain || "DIR"}
+                  #{numId} {domain || "folder"}
                 </span>
               </div>
 
-              {/* Photos Peeking / Radar Display */}
+              {/* Photos Peeking / Preview */}
               <div className="folder-pocket">
                 <div className="preview-polaroids">
                   {folder.photoIds && folder.photoIds.length > 0 ? (
@@ -80,7 +80,7 @@ export default function FolderExplorer({ initialFolders = [] }) {
                       <div className="polaroid pic-left">
                         <img
                           src={`/api/photo/${folder.photoIds[0]}`}
-                          alt="Feed 1"
+                          alt="Photo 1"
                           loading="lazy"
                         />
                       </div>
@@ -88,14 +88,14 @@ export default function FolderExplorer({ initialFolders = [] }) {
                         <div className="polaroid pic-right">
                           <img
                             src={`/api/photo/${folder.photoIds[1]}`}
-                            alt="Feed 2"
+                            alt="Photo 2"
                             loading="lazy"
                           />
                         </div>
                       ) : null}
                     </>
                   ) : (
-                    <div className="empty-pocket">[FEED_OFFLINE]</div>
+                    <div className="empty-pocket">2 Photos</div>
                   )}
                 </div>
               </div>
@@ -116,7 +116,7 @@ export default function FolderExplorer({ initialFolders = [] }) {
                   <span className="time-badge">
                     {folder.date_ist} &bull; {folder.time_ist} IST
                   </span>
-                  <span className="photo-count-pill">2_PICS</span>
+                  <span className="photo-count-pill">2 Pics</span>
                 </div>
               </div>
             </Link>

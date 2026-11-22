@@ -8,17 +8,16 @@ export default async function HomePage() {
     return (
       <main className="wrap">
         <header className="top">
-          <div>
+          <div className="header-left">
             <div className="terminal-brand">
-              <span>[D1::SYS_OFFLINE]</span>
-              <span className="morse-code">--- ..-. ..-. .-.. .. -. .</span>
+              <span>[D1::OFFLINE]</span>
             </div>
-            <h1>TERMINAL // VAULT</h1>
+            <h1>Vault Folders</h1>
             <p>Database connection credentials missing.</p>
           </div>
         </header>
         <div className="warn-card">
-          <h3>[ERR_ENV_MISSING]</h3>
+          <h3>[CONFIG_REQUIRED]</h3>
           <p>
             Please set <code>CLOUDFLARE_ACCOUNT_ID</code>, <code>CLOUDFLARE_API_TOKEN</code>, and{" "}
             <code>CLOUDFLARE_D1_DATABASE_ID</code> on your Vercel Dashboard project settings.
@@ -39,23 +38,23 @@ export default async function HomePage() {
   return (
     <main className="wrap">
       <header className="top">
-        <div>
+        <div className="header-left">
           <div className="terminal-brand">
             <span>[D1::DOC_DUSTBIN]</span>
-            <span className="morse-code">-.-. .-.. --- ..- -..</span>
+            <span className="morse-code">&bull;&bull;&bull; &mdash;&mdash;&mdash; &bull;&bull;&bull;</span>
           </div>
-          <h1>VAULT_FOLDERS // ARCHIVE</h1>
-          <p>&gt; {folders.length} intake directories stored in D1 database</p>
+          <h1>Photo Vault Folders</h1>
+          <p>{folders.length} archived folder{folders.length === 1 ? "" : "s"}</p>
         </div>
         <div className="sys-status-badge">
           <span className="status-blink" />
-          <span>SYS.ONLINE // IST</span>
+          <span>Active (IST)</span>
         </div>
       </header>
 
       {error ? (
         <div className="warn-card">
-          <h3>[D1_DB_NOTICE]</h3>
+          <h3>[DATABASE_NOTICE]</h3>
           <p>{error}</p>
         </div>
       ) : null}

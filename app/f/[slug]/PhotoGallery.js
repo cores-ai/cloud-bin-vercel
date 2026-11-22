@@ -17,11 +17,11 @@ export default function PhotoGallery({ photos = [], email = "" }) {
     <div className="gallery-section">
       <div className="gallery-toolbar">
         <div className="toolbar-left">
-          <h2>BINARY_PAYLOAD // 2_CAPTURES</h2>
-          <p>&gt; high_res_blobs preserved in cloudflare d1 doc-dustbin</p>
+          <h2>2 Stored Photos</h2>
+          <p>Preserved in Cloudflare D1 storage</p>
         </div>
         <button className="copy-action-btn" onClick={copyEmail}>
-          {copied ? "[OK: COPIED]" : "[CLIPBOARD: COPY_EMAIL]"}
+          {copied ? "✓ Copied" : "📋 Copy Email"}
         </button>
       </div>
 
@@ -32,42 +32,42 @@ export default function PhotoGallery({ photos = [], email = "" }) {
           return (
             <div className="photo-card" key={photo.id}>
               <div className="photo-card-top">
-                <span className="photo-index">[IMG_STREAM #{picNum}/2]</span>
+                <span className="photo-index">Photo {picNum} of 2</span>
                 <a
                   href={photoUrl}
-                  download={`capture_${picNum}.jpg`}
+                  download={`photo_${picNum}.jpg`}
                   className="download-link"
                 >
-                  [GET_BLOB]
+                  Download
                 </a>
               </div>
 
               <div
                 className="photo-img-wrapper"
                 onClick={() => setSelectedPhoto(photoUrl)}
-                title="Inspect in full viewport"
+                title="Click to view full screen"
               >
                 <img
                   src={photoUrl}
-                  alt={`Capture ${picNum}`}
+                  alt={`Photograph ${picNum}`}
                   className="photo-img"
                   loading="lazy"
                 />
-                <div className="zoom-hint">[ZOOM_FEED]</div>
+                <div className="zoom-hint">🔍 Expand</div>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Terminal Lightbox Modal */}
+      {/* Lightbox Modal */}
       {selectedPhoto ? (
         <div className="lightbox-overlay" onClick={() => setSelectedPhoto(null)}>
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <button className="lightbox-close" onClick={() => setSelectedPhoto(null)}>
-              [ESC_CLOSE]
+              ✕ Close
             </button>
-            <img src={selectedPhoto} alt="Full resolution feed" className="lightbox-img" />
+            <img src={selectedPhoto} alt="Full resolution view" className="lightbox-img" />
           </div>
         </div>
       ) : null}
