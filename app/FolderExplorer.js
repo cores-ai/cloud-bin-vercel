@@ -8,11 +8,20 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
   const [search, setSearch] = useState("");
   const [deletingSlug, setDeletingSlug] = useState(null);
 
+  // Status Editor Modal State
+  const [editingFolder, setEditingFolder] = useState(null);
+  const [editSale, setEditSale] = useState("unsold");
+  const [editWork, setEditWork] = useState("pending");
+  const [savingStatus, setSavingStatus] = useState(false);
+
   const filtered = folders.filter((f) => {
     const q = search.toLowerCase();
     return (
       f.email.toLowerCase().includes(q) ||
       f.folder_label.toLowerCase().includes(q) ||
+      (f.author && f.author.toLowerCase().includes(q)) ||
+      (f.sale_status && f.sale_status.toLowerCase().includes(q)) ||
+      (f.work_status && f.work_status.toLowerCase().includes(q)) ||
       (f.date_ist && f.date_ist.toLowerCase().includes(q))
     );
   });
@@ -37,6 +46,51 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
       alert("Network error while deleting folder.");
     } finally {
       setDeletingSlug(null);
+    }
+  };
+
+  const openStatusEditor = (e, folder) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingFolder(folder);
+    setEditSale(folder.sale_status || "unsold");
+    setEditWork(folder.work_status || "pending");
+  };
+
+  const closeStatusEditor = () => {
+    setEditingFolder(null);
+  };
+
+  const saveStatusChanges = async () => {
+    if (!editingFolder) return;
+    setSavingStatus(true);
+    try {
+      const res = await fetch(`/api/folder/${encodeURIComponent(editingFolder.folder_slug)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sale_status: editSale,
+          work_status: editWork,
+        }),
+      });
+
+      if (res.ok) {
+        setFolders((prev) =>
+          prev.map((item) =>
+            item.folder_slug === editingFolder.folder_slug
+              ? { ...item, sale_status: editSale, work_status: editWork }
+              : item
+          )
+        );
+        closeStatusEditor();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to update status.");
+      }
+    } catch {
+      alert("Network error while updating status.");
+    } finally {
+      setSavingStatus(false);
     }
   };
 
@@ -78,7 +132,7 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
           <input
             type="text"
             className="search-input"
-            placeholder="filter folders by email / date..."
+            placeholder="filter by email / date / status / author..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -112,6 +166,9 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
           const username = emailParts[0];
           const domain = emailParts[1] ? `@${emailParts[1]}` : "";
           const numId = (index + 1).toString().padStart(2, "0");
+          const author = folder.author || "A";
+          const isSold = folder.sale_status === "sold";
+          const isComplete = folder.work_status === "complete";
 
           return (
             <Link
@@ -119,11 +176,27 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
               className="folder-card"
               key={folder.folder_slug}
             >
-              {/* Folder Tab Header */}
-              <div className="folder-tab">
-                <span className="domain-pill" title={folder.email}>
-                  #{numId} {domain || "folder"}
-                </span>
+              {/* Folder Tab Header Bar with Domain, Author & Statuses */}
+              <div className="folder-tab-bar">
+                <div className="folder-tab-left">
+                  <span className="domain-pill" title={folder.email}>
+                    #{numId} {domain || "folder"}
+                  </span>
+                  {/* Uploader Name Tag (A, P, AP) */}
+                  <span className="author-badge" title={`Document Uploader: ${author}`}>
+                    {author}
+                  </span>
+                </div>
+
+                {/* Right Tab Status Chips (Clickable to Edit) */}
+                <div className="folder-tab-right" onClick={(e) => openStatusEditor(e, folder)} title="Click to change status">
+                  <span className={`status-pill sale-pill ${isSold ? "pill-sold" : "pill-unsold"}`}>
+                    {isSold ? "SOLD" : "UNSOLD"}
+                  </span>
+                  <span className={`status-pill work-pill ${isComplete ? "pill-complete" : "pill-pending"}`}>
+                    {isComplete ? "DONE" : "PENDING"}
+                  </span>
+                </div>
               </div>
 
               {/* Photos Peeking / Preview with Signed Tokens */}
@@ -166,14 +239,20 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
                   <span className="email-text">{folder.email}</span>
                 </div>
 
-                {/* Folder Footer with Mini Delete Button */}
+                {/* Folder Footer with Mini Delete & Status Edit Buttons */}
                 <div className="folder-meta">
                   <span className="time-badge">
                     {folder.date_ist} &bull; {folder.time_ist} IST
                   </span>
                   
                   <div className="meta-actions">
-                    <span className="photo-count-pill">2 Pics</span>
+                    <button
+                      className="mini-edit-btn"
+                      onClick={(e) => openStatusEditor(e, folder)}
+                      title="Edit Sale & Processing Status"
+                    >
+                      ✎ Edit
+                    </button>
                     <button
                       className="mini-del-btn"
                       onClick={(e) => handleDelete(e, folder.folder_slug, folder.email)}
@@ -206,6 +285,95 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
           );
         })}
       </section>
+
+      {/* Status Editor Modal (Save / Discard) */}
+      {editingFolder ? (
+        <div className="status-modal-backdrop" onClick={closeStatusEditor}>
+          <div className="status-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title">[STATUS_SETTINGS]</div>
+              <button className="modal-close-btn" onClick={closeStatusEditor}>✕</button>
+            </div>
+
+            <div className="modal-sub">
+              Target: <code>{editingFolder.folder_label || editingFolder.email}</code>
+            </div>
+
+            {/* Author (Read Only / Locked) */}
+            <div className="modal-field">
+              <label className="field-label">
+                UPLOADER <span>(Locked at intake)</span>
+              </label>
+              <div className="locked-author-box">
+                <span className="author-badge-large">{editingFolder.author || "A"}</span>
+                <span className="locked-note">🔒 Set at Telegram Intake (Immutable)</span>
+              </div>
+            </div>
+
+            {/* Sale Status Toggle */}
+            <div className="modal-field">
+              <label className="field-label">SALE STATUS</label>
+              <div className="toggle-btn-group">
+                <button
+                  type="button"
+                  className={`toggle-option ${editSale === "unsold" ? "opt-active unsold-active" : ""}`}
+                  onClick={() => setEditSale("unsold")}
+                >
+                  🏷️ Unsold
+                </button>
+                <button
+                  type="button"
+                  className={`toggle-option ${editSale === "sold" ? "opt-active sold-active" : ""}`}
+                  onClick={() => setEditSale("sold")}
+                >
+                  💰 Sold
+                </button>
+              </div>
+            </div>
+
+            {/* Processing Status Toggle */}
+            <div className="modal-field">
+              <label className="field-label">PROCESSING STATUS</label>
+              <div className="toggle-btn-group">
+                <button
+                  type="button"
+                  className={`toggle-option ${editWork === "pending" ? "opt-active pending-active" : ""}`}
+                  onClick={() => setEditWork("pending")}
+                >
+                  ⏳ Pending
+                </button>
+                <button
+                  type="button"
+                  className={`toggle-option ${editWork === "complete" ? "opt-active complete-active" : ""}`}
+                  onClick={() => setEditWork("complete")}
+                >
+                  ✅ Complete
+                </button>
+              </div>
+            </div>
+
+            {/* Action Buttons: Save & Discard */}
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn-discard"
+                onClick={closeStatusEditor}
+                disabled={savingStatus}
+              >
+                Discard
+              </button>
+              <button
+                type="button"
+                className="btn-save"
+                onClick={saveStatusChanges}
+                disabled={savingStatus}
+              >
+                {savingStatus ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

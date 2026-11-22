@@ -15,7 +15,6 @@ export default async function FolderPage({ params }) {
   }
 
   const slug = params?.slug;
-  // Security validation: ensure slug contains only safe characters
   if (!slug || !/^[a-z0-9_-]+$/i.test(slug)) {
     notFound();
   }
@@ -37,6 +36,7 @@ export default async function FolderPage({ params }) {
           <div className="header-meta">
             <div className="terminal-brand">
               <span>[DIR_INSPECT]</span>
+              <span className="author-badge-large">{folder.author || "A"}</span>
             </div>
             <h1 className="header-title">{folder.folder_label}</h1>
 
@@ -48,13 +48,22 @@ export default async function FolderPage({ params }) {
             <div className="time-stamp-box">
               <span>🕒 Created: {folder.date_ist} at {folder.time_ist} IST</span>
               <span className="sep">&bull;</span>
+              <span>Uploader: <b>{folder.author || "A"}</b></span>
+              <span className="sep">&bull;</span>
               <span>Cloud Bin</span>
             </div>
           </div>
         </div>
 
-        {/* 2 Stored High-Res Photographs */}
-        <PhotoGallery photos={folder.photos} email={folder.email} folderSlug={folder.folder_slug} />
+        {/* 2 Stored High-Res Photographs & Status Controls */}
+        <PhotoGallery
+          photos={folder.photos}
+          email={folder.email}
+          folderSlug={folder.folder_slug}
+          initialSale={folder.sale_status || "unsold"}
+          initialWork={folder.work_status || "pending"}
+          author={folder.author || "A"}
+        />
       </section>
     </main>
   );
