@@ -22,7 +22,7 @@ export default function FolderExplorer({ initialFolders = [], error = "" }) {
         {/* Left side on mobile / top-left on desktop */}
         <div className="header-meta-side">
           <div className="terminal-brand">
-            <span>[D1::DOC_DUSTBIN]</span>
+            <span>Cloud Bin</span>
             <span className="morse-code">&bull;&bull;&bull; &mdash;&mdash;&mdash; &bull;&bull;&bull;</span>
           </div>
           <div className="sys-status-badge">

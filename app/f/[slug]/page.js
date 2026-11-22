@@ -42,7 +42,7 @@ export default async function FolderPage({ params }) {
             <div className="time-stamp-box">
               <span>🕒 Created: {folder.date_ist} at {folder.time_ist} IST</span>
               <span className="sep">&bull;</span>
-              <span>D1 doc-dustbin</span>
+              <span>Cloud Bin</span>
             </div>
           </div>
         </div>
