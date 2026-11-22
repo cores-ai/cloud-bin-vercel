@@ -39,34 +39,7 @@ export default async function HomePage() {
 
   return (
     <main className="wrap">
-      <header className="top">
-        {/* Left side on mobile / top-left on desktop */}
-        <div className="header-meta-side">
-          <div className="terminal-brand">
-            <span>[D1::DOC_DUSTBIN]</span>
-            <span className="morse-code">&bull;&bull;&bull; &mdash;&mdash;&mdash; &bull;&bull;&bull;</span>
-          </div>
-          <div className="sys-status-badge">
-            <span className="status-blink" />
-            <span>Active (IST)</span>
-          </div>
-        </div>
-
-        {/* The 2 items user requested right-aligned on mobile */}
-        <div className="header-title-block">
-          <h1>Photo Vault Folders</h1>
-          <p>{folders.length} archived folder{folders.length === 1 ? "" : "s"}</p>
-        </div>
-      </header>
-
-      {error ? (
-        <div className="warn-card">
-          <h3>[DATABASE_NOTICE]</h3>
-          <p>{error}</p>
-        </div>
-      ) : null}
-
-      <FolderExplorer initialFolders={folders} />
+      <FolderExplorer initialFolders={folders} error={error} />
     </main>
   );
 }

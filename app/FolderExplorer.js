@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export default function FolderExplorer({ initialFolders = [] }) {
+export default function FolderExplorer({ initialFolders = [], error = "" }) {
   const [search, setSearch] = useState("");
 
   const filtered = initialFolders.filter((f) => {
@@ -17,6 +17,37 @@ export default function FolderExplorer({ initialFolders = [] }) {
 
   return (
     <div className="explorer">
+      {/* Top Header */}
+      <header className="top">
+        {/* Left side on mobile / top-left on desktop */}
+        <div className="header-meta-side">
+          <div className="terminal-brand">
+            <span>[D1::DOC_DUSTBIN]</span>
+            <span className="morse-code">&bull;&bull;&bull; &mdash;&mdash;&mdash; &bull;&bull;&bull;</span>
+          </div>
+          <div className="sys-status-badge">
+            <span className="status-blink" />
+            <span>Active (IST)</span>
+          </div>
+        </div>
+
+        {/* Right side on mobile: Title, Archived count, and Search Match count directly underneath */}
+        <div className="header-title-block">
+          <h1>Photo Vault Folders</h1>
+          <p>{initialFolders.length} archived folder{initialFolders.length === 1 ? "" : "s"}</p>
+          <div className="count-tag-mobile">
+            {filtered.length} of {initialFolders.length} folders
+          </div>
+        </div>
+      </header>
+
+      {error ? (
+        <div className="warn-card">
+          <h3>[DATABASE_NOTICE]</h3>
+          <p>{error}</p>
+        </div>
+      ) : null}
+
       {/* Search & Prompt Filter */}
       <div className="controls">
         <div className="search-wrap">
@@ -34,12 +65,13 @@ export default function FolderExplorer({ initialFolders = [] }) {
             </button>
           ) : null}
         </div>
-        <div className="count-tag">
+        {/* Desktop count tag stays next to search bar on desktop only */}
+        <div className="count-tag desktop-only">
           {filtered.length} of {initialFolders.length} folders
         </div>
       </div>
 
-      {/* Clean, Subtle Empty Indicator (No bulky/weird box) */}
+      {/* Clean, Subtle Empty Indicator */}
       {filtered.length === 0 ? (
         <div className="empty-state">
           <span className="empty-dot" />

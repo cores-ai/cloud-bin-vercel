@@ -185,6 +185,10 @@ header.top {
   text-align: left;
 }
 
+.count-tag-mobile {
+  display: none;
+}
+
 /* Clean Empty State with Curved Corners */
 .empty-state {
   display: flex;
@@ -747,9 +751,17 @@ header.top {
     max-width: 100%;
   }
 
-  .count-tag {
-    font-size: 9.5px;
-    text-align: left; /* Kept on the left! */
+  .count-tag-mobile {
+    display: block;
+    font-size: 9px;
+    color: var(--text-dim);
+    text-align: right;
+    margin-top: 1px;
+    white-space: nowrap;
+  }
+
+  .count-tag.desktop-only {
+    display: none;
   }
 
   .grid {
